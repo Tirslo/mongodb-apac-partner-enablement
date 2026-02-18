@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MongoDB Partner Enablement — Technical Plan</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%2300ED64'/><path d='M50 15c0 0-15 15-15 35s10 30 15 35c5-5 15-15 15-35S50 15 50 15Z' fill='%23001E2B'/></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  /* ═══════════════════════════════════════════════════
+     DESIGN TOKENS
+     ═══════════════════════════════════════════════════ */
+  :root {
+    --mg: #00ED64;
+    --mg-dark: #00684A;
+    --mg-forest: #001E2B;
+    --mg-slate: #0B2330;
+    --mg-slate-light: #112733;
+    --mg-gray: #889397;
+    --mg-gray-light: #B8C4C8;
+    --mg-white: #FFFFFF;
+    --mg-glow: rgba(0,237,100,0.12);
+    --mg-glow-s: rgba(0,237,100,0.25);
+    --blue: #60A5FA;
+    --blue-glow: rgba(59,130,246,0.12);
+    --purple: #C084FC;
+    --purple-glow: rgba(168,85,247,0.12);
+    --amber: #FBBF24;
+    --amber-glow: rgba(251,191,36,0.12);
+    --r: 12px;
+    --r-lg: 20px;
+    --r-xl: 28px;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --max-w: 1140px;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     RESET & BASE
+     ═══════════════════════════════════════════════════ */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--mg-forest);
+    color: var(--mg-white);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Noise */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0;
+  }
+
+  .wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+
+  /* ═══════════════════════════════════════════════════
+     NAV
+     ═══════════════════════════════════════════════════ */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(0,30,43,0.85);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  nav .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 0.9rem; letter-spacing: -0.01em;
+    text-decoration: none; color: var(--mg-white);
+  }
+  .nav-brand svg { flex-shrink: 0; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    color: var(--mg-gray); text-decoration: none; font-size: 0.82rem;
+    font-weight: 500; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--mg-white); }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+  }
+
+  /* ═══════════════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════════════ */
+  .hero {
+    padding: 100px 0 80px;
+    text-align: center;
+    position: relative;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 60%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--mg-glow-s), transparent);
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--mg-glow); border: 1px solid rgba(0,237,100,0.18);
+    border-radius: 100px; padding: 6px 16px 6px 8px;
+    font-size: 0.78rem; color: var(--mg); font-weight: 500;
+    margin-bottom: 28px;
+  }
+  .hero-badge .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--mg);
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+  }
+  .hero h1 {
+    font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+    font-weight: 700; letter-spacing: -0.04em; line-height: 1.08;
+    margin-bottom: 18px;
+  }
+  .hero h1 em { font-style: normal; color: var(--mg); }
+  .hero .sub {
+    font-size: 1.1rem; color: var(--mg-gray); max-width: 640px; margin: 0 auto;
+  }
+  .pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 36px; }
+  .pill {
+    background: var(--mg-glow); border: 1px solid rgba(0,237,100,0.15);
+    border-radius: 100px; padding: 8px 18px;
+    font-size: 0.8rem; color: var(--mg); font-weight: 500;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     SECTIONS
+     ═══════════════════════════════════════════════════ */
+  .section { padding: 80px 0 40px; }
+  .section-label {
+    text-transform: uppercase; letter-spacing: 0.14em;
+    font-size: 0.7rem; color: var(--mg); font-weight: 600;
+    font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; text-align: center;
+  }
+  .section-title {
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-weight: 700; letter-spacing: -0.025em; text-align: center; margin-bottom: 8px;
+  }
+  .section-desc {
+    color: var(--mg-gray); text-align: center; max-width: 540px;
+    margin: 0 auto 48px; font-size: 0.95rem;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     CARDS (generic clickable tile)
+     ═══════════════════════════════════════════════════ */
+  .card-grid {
+    display: grid; gap: 14px;
+  }
+  .card-grid.cols-3 { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .card-grid.cols-4 { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+  .card-grid.cols-5 { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+  /* Flex-centered grid for rows that don't fill evenly */
+  .card-grid.flex-center {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;
+  }
+  .card-grid.flex-center .card {
+    width: calc(25% - 12px); min-width: 240px;
+  }
+  @media (max-width: 768px) {
+    .card-grid.flex-center .card { width: calc(50% - 8px); }
+  }
+  @media (max-width: 520px) {
+    .card-grid.flex-center .card { width: 100%; }
+  }
+
+  .card {
+    background: var(--mg-slate);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--r);
+    padding: 24px 22px;
+    position: relative; overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.25s var(--ease), transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  }
+  .card:hover {
+    border-color: rgba(0,237,100,0.25);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--mg); opacity: 0; transition: opacity 0.25s;
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card .card-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; margin-bottom: 14px;
+    background: var(--mg-glow);
+  }
+  .card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
+  .card p { font-size: 0.8rem; color: var(--mg-gray); line-height: 1.5; }
+  .card .arrow-hint {
+    position: absolute; top: 20px; right: 20px;
+    color: var(--mg-gray); font-size: 0.9rem;
+    opacity: 0; transition: opacity 0.25s, transform 0.25s;
+    transform: translateX(-4px);
+  }
+  .card:hover .arrow-hint { opacity: 1; transform: translateX(0); }
+
+  /* Color variants for phase cards */
+  .card[data-color="green"]::before { background: var(--mg); }
+  .card[data-color="green"] .card-icon { background: var(--mg-glow); }
+  .card[data-color="blue"]::before { background: var(--blue); }
+  .card[data-color="blue"] .card-icon { background: var(--blue-glow); }
+  .card[data-color="purple"]::before { background: var(--purple); }
+  .card[data-color="purple"] .card-icon { background: var(--purple-glow); }
+  .card[data-color="amber"]::before { background: var(--amber); }
+  .card[data-color="amber"] .card-icon { background: var(--amber-glow); }
+
+  /* ═══════════════════════════════════════════════════
+     PATHWAY PROGRESS BAR
+     ═══════════════════════════════════════════════════ */
+  .pathway-bar {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; margin-bottom: 48px;
+  }
+  .pw-node {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 700;
+    flex-shrink: 0; position: relative;
+  }
+  .pw-node.green { background: var(--mg-glow); border: 2px solid var(--mg); color: var(--mg); }
+  .pw-node.blue { background: var(--blue-glow); border: 2px solid var(--blue); color: var(--blue); }
+  .pw-node.purple { background: var(--purple-glow); border: 2px solid var(--purple); color: var(--purple); }
+  .pw-line { width: 80px; height: 2px; flex-shrink: 0; }
+  .pw-line.g2b { background: linear-gradient(90deg, var(--mg), var(--blue)); }
+  .pw-line.b2p { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+
+  /* ═══════════════════════════════════════════════════
+     PHASE BADGE (inside pathway cards)
+     ═══════════════════════════════════════════════════ */
+  .phase-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 3px 10px; border-radius: 100px; margin-bottom: 10px;
+  }
+  .phase-badge.green { background: var(--mg-glow); color: var(--mg); }
+  .phase-badge.blue { background: var(--blue-glow); color: var(--blue); }
+  .phase-badge.purple { background: var(--purple-glow); color: var(--purple); }
+
+  /* ═══════════════════════════════════════════════════
+     DETAIL MODAL / SLIDE-OVER
+     ═══════════════════════════════════════════════════ */
+  .overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,14,20,0.7);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s var(--ease);
+  }
+  .overlay.open { opacity: 1; pointer-events: all; }
+
+  .detail-panel {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 210;
+    width: min(560px, 92vw);
+    background: var(--mg-slate);
+    border-left: 1px solid rgba(255,255,255,0.06);
+    transform: translateX(100%);
+    transition: transform 0.35s var(--ease);
+    overflow-y: auto;
+    display: flex; flex-direction: column;
+  }
+  .detail-panel.open { transform: translateX(0); }
+
+  .detail-header {
+    padding: 28px 32px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: flex-start; gap: 16px;
+    position: sticky; top: 0; background: var(--mg-slate); z-index: 5;
+  }
+  .detail-header .icon-wrap {
+    width: 48px; height: 48px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .detail-header .icon-wrap.green { background: var(--mg-glow); }
+  .detail-header .icon-wrap.blue { background: var(--blue-glow); }
+  .detail-header .icon-wrap.purple { background: var(--purple-glow); }
+  .detail-header .icon-wrap.amber { background: var(--amber-glow); }
+  .detail-header h2 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em; }
+  .detail-header .badge-row { margin-top: 4px; }
+  .close-btn {
+    margin-left: auto; flex-shrink: 0;
+    width: 36px; height: 36px; border-radius: 10px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+    color: var(--mg-gray); font-size: 1.1rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, color 0.2s;
+  }
+  .close-btn:hover { background: rgba(255,255,255,0.1); color: var(--mg-white); }
+
+  .detail-body { padding: 28px 32px 40px; flex: 1; }
+  .detail-body .desc {
+    color: var(--mg-gray-light); font-size: 0.92rem; line-height: 1.65;
+    margin-bottom: 28px;
+  }
+
+  .detail-body h4 {
+    font-size: 0.72rem; font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--mg); margin-bottom: 14px; font-weight: 600;
+  }
+
+  .topic-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .topic-row .dot {
+    width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0;
+  }
+  .topic-row .dot.green { background: var(--mg); }
+  .topic-row .dot.blue { background: var(--blue); }
+  .topic-row .dot.purple { background: var(--purple); }
+  .topic-row .dot.amber { background: var(--amber); }
+  .topic-row strong { font-size: 0.88rem; display: block; margin-bottom: 2px; }
+  .topic-row .topic-desc { font-size: 0.8rem; color: var(--mg-gray); line-height: 1.5; }
+
+  .detail-body .resources-list { margin-top: 28px; }
+  .resource-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 8px; margin-bottom: 6px;
+    text-decoration: none; color: var(--mg-white);
+    font-size: 0.84rem; font-weight: 500;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .resource-link:hover {
+    background: var(--mg-glow);
+    border-color: rgba(0,237,100,0.2);
+  }
+  .resource-link .r-icon { color: var(--mg); font-size: 0.9rem; }
+
+  /* ═══════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════ */
+  footer {
+    padding: 40px 0;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--mg-gray);
+    font-family: 'JetBrains Mono', monospace;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    margin-top: 40px;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     SCROLL REVEAL
+     ═══════════════════════════════════════════════════ */
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
+  }
+  .reveal.vis { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap">
+    <a href="#" class="nav-brand">
+      <svg width="28" height="28" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="50" fill="#00ED64"/><path d="M50 15c0 0-15 15-15 35s10 30 15 35c5-5 15-15 15-35S50 15 50 15Z" fill="#001E2B"/></svg>
+      Partner Enablement
+    </a>
+    <div class="nav-links">
+      <a href="#presales">Presales</a>
+      <a href="#pathway">Technical Pathway</a>
+      <a href="#certs">Certifications</a>
+      <a href="#tracks">Specialised Tracks</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-badge"><span class="dot"></span> Partner Technical Plan</div>
+    <h1>Enablement as a<br><em>Growth Engine</em></h1>
+    <p class="sub">MongoDB equips partners with structured, role-based enablement designed to accelerate enterprise readiness, strengthen delivery quality, and support scalable MongoDB practices.</p>
+    <div class="pills">
+      <span class="pill">Faster Partner Ramp-Up</span>
+      <span class="pill">Consistent Delivery Quality</span>
+      <span class="pill">Go-to-Market Aligned</span>
+    </div>
+  </div>
+</section>
+
+<!-- PRESALES -->
+<section class="section" id="presales">
+  <div class="wrap">
+    <div class="section-label reveal">Phase 0 — Foundation</div>
+    <h2 class="section-title reveal">Presales Enablement</h2>
+    <p class="section-desc reveal">Equip your team to position MongoDB with confidence and win competitive deals.</p>
+    <div id="presales-grid" class="card-grid flex-center"></div>
+  </div>
+</section>
+
+<!-- TECHNICAL PATHWAY -->
+<section class="section" id="pathway">
+  <div class="wrap">
+    <div class="section-label reveal">Technical Enablement</div>
+    <h2 class="section-title reveal">The Pathway to Success</h2>
+    <p class="section-desc reveal">A progressive three-phase curriculum from foundational concepts to advanced operations.</p>
+    <div class="pathway-bar reveal">
+      <div class="pw-node green">101</div>
+      <div class="pw-line g2b"></div>
+      <div class="pw-node blue">201</div>
+      <div class="pw-line b2p"></div>
+      <div class="pw-node purple">301</div>
+    </div>
+    <div id="pathway-grid" class="card-grid cols-3"></div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section class="section" id="certs">
+  <div class="wrap">
+    <div class="section-label reveal">Validation</div>
+    <h2 class="section-title reveal">Certifications</h2>
+    <p class="section-desc reveal">Validate partner competency and unlock co-sell opportunities.</p>
+    <div id="certs-grid" class="card-grid cols-4"></div>
+  </div>
+</section>
+
+<!-- SPECIALISED TRACKS -->
+<section class="section" id="tracks">
+  <div class="wrap">
+    <div class="section-label reveal">Beyond the Core</div>
+    <h2 class="section-title reveal">Specialised Tracks</h2>
+    <p class="section-desc reveal">Custom enablement paths for emerging technologies and use cases.</p>
+    <div id="tracks-grid" class="card-grid cols-4"></div>
+  </div>
+</section>
+
+<footer><div class="wrap">MongoDB Partner Enablement — Technical Plan 2026</div></footer>
+
+<!-- OVERLAY + DETAIL PANEL -->
+<div class="overlay" id="overlay"></div>
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-header" id="detail-header"></div>
+  <div class="detail-body" id="detail-body"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   DATA — EDIT THIS SECTION TO UPDATE ALL CONTENT
+   ═══════════════════════════════════════════════════════════════════
+
+   Each item has:
+   - id:          unique key
+   - icon:        emoji
+   - title:       card title
+   - summary:     short text shown on card
+   - color:       "green" | "blue" | "purple" | "amber" (controls accent)
+   - badge:       (optional) small label e.g. "Phase 1 — Foundations"
+   - description: longer text shown in detail panel
+   - topics:      array of { name, detail } — the expandable content
+   - resources:   (optional) array of { label, url } — helpful links
+
+   ═══════════════════════════════════════════════════════════════════ */
+
+const DATA = {
+
+  presales: [
+    {
+      id: "positioning",
+      icon: "🎯",
+      title: "Positioning MongoDB",
+      summary: "Master the value proposition, platform story, and key differentiators.",
+      color: "green",
+      description: "Learn how to articulate MongoDB's value to enterprise buyers. Covers the developer data platform narrative, Atlas positioning, and how to map MongoDB capabilities to business outcomes.",
+      topics: [
+        { name: "Developer Data Platform Story", detail: "Understand MongoDB's unified platform narrative — operational, analytical, and AI workloads on one platform." },
+        { name: "Atlas Value Proposition", detail: "Position Atlas as the fully managed cloud database that eliminates operational overhead while delivering enterprise-grade capabilities." },
+        { name: "Enterprise Buyer Mapping", detail: "Map MongoDB features to CTO/CIO priorities: cost reduction, developer productivity, time-to-market, and resilience." },
+        { name: "ROI & Business Case", detail: "Build compelling business cases using TCO comparisons, productivity metrics, and customer proof points." },
+      ],
+      resources: []
+    },
+    {
+      id: "use-cases",
+      icon: "🏢",
+      title: "Industry Use Cases",
+      summary: "Real-world deployment patterns across key verticals.",
+      color: "green",
+      description: "Explore proven MongoDB deployment patterns across financial services, retail, telco, healthcare, and the public sector. Learn to identify high-value use cases during discovery.",
+      topics: [
+        { name: "Financial Services", detail: "Real-time payments, fraud detection, single view of customer, regulatory reporting." },
+        { name: "Retail & E-Commerce", detail: "Product catalog, inventory management, personalisation engines, order management." },
+        { name: "Telecommunications", detail: "Network inventory, BSS/OSS modernisation, customer 360, IoT data management." },
+        { name: "Healthcare & Life Sciences", detail: "Patient records, clinical trials, drug discovery data, interoperability layers." },
+        { name: "Public Sector", detail: "Citizen services, case management, data consolidation, compliance platforms." },
+      ],
+      resources: []
+    },
+    {
+      id: "comparison",
+      icon: "⚔️",
+      title: "Comparison",
+      summary: "How MongoDB compares against other databases.",
+      color: "green",
+      description: "Understand how MongoDB compares to other databases in the market. Learn to handle objections and position Atlas as the multi-cloud, developer-first alternative.",
+      topics: [
+        { name: "vs. Relational Databases", detail: "Document model flexibility, schema evolution, horizontal scaling vs. rigid schemas and vertical scaling limits." },
+        { name: "vs. Other Document & NoSQL Databases", detail: "Developer experience, query capabilities, ACID transactions, Atlas managed service advantages, and ecosystem maturity." },
+        { name: "vs. Cloud-Native Databases", detail: "True MongoDB compatibility, multi-cloud portability, richer feature set, and superior query capabilities." },
+        { name: "Multi-Cloud Strategy", detail: "Position Atlas as the only truly multi-cloud database — run on AWS, Azure, and GCP with a single API." },
+      ],
+      resources: []
+    },
+    {
+      id: "sizing",
+      icon: "📐",
+      title: "Sizing",
+      summary: "Right-size cluster configurations and workload estimates.",
+      color: "green",
+      description: "Learn to estimate Atlas cluster sizing based on workload characteristics, data volume, throughput requirements, and growth projections.",
+      topics: [
+        { name: "Workload Profiling", detail: "Characterise read/write ratios, document sizes, query patterns, and concurrency requirements." },
+        { name: "Atlas Tier Selection", detail: "Map workload profiles to appropriate Atlas cluster tiers (M10 through M700+)." },
+        { name: "Storage & IOPS Estimation", detail: "Calculate storage needs including indexes, oplog, and working set size for optimal performance." },
+        { name: "Growth Planning", detail: "Build scaling plans using auto-scaling, sharding thresholds, and capacity runway analysis." },
+      ],
+      resources: []
+    },
+  ],
+
+  pathway: [
+    {
+      id: "101",
+      icon: "📗",
+      title: "101 — Core Platform Knowledge",
+      summary: "Document model, Atlas, developer platform, and essential tooling.",
+      color: "green",
+      badge: "Phase 1 — Foundations",
+      badgeColor: "green",
+      description: "Build a solid understanding of MongoDB's document model, platform capabilities, and the core tooling ecosystem every partner needs to know.",
+      topics: [
+        { name: "Document Model", detail: "Understand BSON, flexible schemas, embedded documents, arrays, and how the document model maps to application objects naturally." },
+        { name: "Atlas Overview", detail: "Navigate Atlas UI, understand clusters, projects, organisations, monitoring, alerts, and the Atlas CLI." },
+        { name: "Developer Data Platform", detail: "Overview of Atlas as a unified platform: database, search, vector search, data federation, streams, and device sync." },
+        { name: "Enterprise Advanced", detail: "On-premises deployment option. Understand when EA is appropriate vs. Atlas, and its key components (mongod, mongos, config servers)." },
+        { name: "Data Explorer / Compass", detail: "Use Atlas Data Explorer and Compass for visual query building, schema analysis, index suggestions, and data exploration." },
+      ],
+      resources: []
+    },
+    {
+      id: "201",
+      icon: "📘",
+      title: "201 — Platform Depth & Integration",
+      summary: "Search, data modelling, migration, and cloud integrations.",
+      color: "blue",
+      badge: "Phase 2 — Intermediate",
+      badgeColor: "blue",
+      description: "Deepen expertise in Atlas Search, vector search, data modelling best practices, migration strategies, and hyperscaler integrations.",
+      topics: [
+        { name: "Search / Vector Search", detail: "Build full-text search and semantic search experiences using Atlas Search and Vector Search. Covers index definitions, analyzers, scoring, and RAG patterns." },
+        { name: "Hyperscaler Integrations", detail: "Connect Atlas with AWS, Azure, and GCP services: PrivateLink, event-driven architectures, serverless triggers, and cloud-native toolchains." },
+        { name: "Enterprise Advanced / Atlas Deployments", detail: "Deep dive into deployment topologies, replica sets, multi-region clusters, and hybrid Atlas + EA architectures." },
+        { name: "MongoDB Data Modelling", detail: "Schema design patterns: embedding vs. referencing, polymorphism, bucket pattern, outlier pattern, and anti-patterns to avoid." },
+        { name: "Relational Migrator", detail: "Use MongoDB Relational Migrator to analyse relational schemas, design target document models, and execute data migrations from Oracle, SQL Server, PostgreSQL, and MySQL." },
+      ],
+      resources: []
+    },
+    {
+      id: "301",
+      icon: "📙",
+      title: "301 — Operations & Security Mastery",
+      summary: "Ops Manager, security hardening, encryption, and sharding.",
+      color: "purple",
+      badge: "Phase 3 — Advanced",
+      badgeColor: "purple",
+      description: "Master production-grade operations, security hardening, encryption technologies, and scale-out architectures for the most demanding enterprise deployments.",
+      topics: [
+        { name: "Ops Manager Deployments", detail: "Deploy and manage MongoDB at scale with Ops Manager: automation, monitoring, backup, and disaster recovery." },
+        { name: "Atlas Best Practice", detail: "Production readiness checklist: multi-region clusters, backup policies, performance advisor, index optimisation, and cost management." },
+        { name: "Security Best Practice", detail: "Authentication methods, RBAC, LDAP/Kerberos integration, auditing, network security, and compliance frameworks (SOC2, HIPAA, GDPR)." },
+        { name: "Encryption (CSFLE, Queryable Encryption)", detail: "Implement Client-Side Field Level Encryption and Queryable Encryption for zero-trust data protection — encrypt before it reaches the server." },
+        { name: "Integrations", detail: "Connect MongoDB with BI tools (Tableau, Power BI), Kafka, Spark, Kubernetes operators, and CI/CD pipelines." },
+        { name: "Sharding", detail: "Horizontal scale-out: shard key selection strategies, chunk migration, balancer tuning, and zone sharding for data locality." },
+      ],
+      resources: []
+    },
+  ],
+
+  certifications: [
+    {
+      id: "si-assoc",
+      icon: "🛡️",
+      title: "SI Associate",
+      summary: "Foundational MongoDB competency.",
+      color: "green",
+      description: "The SI Associate certification validates foundational knowledge of MongoDB concepts, Atlas platform navigation, and basic CRUD operations.",
+      topics: [
+        { name: "Exam Coverage", detail: "Document model fundamentals, Atlas UI navigation, basic CRUD operations, index basics, and aggregation pipeline introduction." },
+        { name: "Prerequisites", detail: "Completion of 101 enablement track or equivalent MongoDB University courses (M001, M100)." },
+        { name: "Format", detail: "Online proctored exam. Multiple choice and scenario-based questions. 90 minutes." },
+      ],
+      resources: []
+    },
+    {
+      id: "si-arch",
+      icon: "🏛️",
+      title: "SI Architect",
+      summary: "Solution design & architecture.",
+      color: "green",
+      description: "Validates the ability to design MongoDB solutions for enterprise workloads, including schema design, deployment architecture, and integration planning.",
+      topics: [
+        { name: "Exam Coverage", detail: "Data modelling patterns, deployment topologies (Atlas & EA), security architecture, performance optimisation, and migration planning." },
+        { name: "Prerequisites", detail: "SI Associate certification plus completion of 201 enablement track." },
+        { name: "Format", detail: "Online proctored exam with architecture scenario questions. 120 minutes." },
+      ],
+      resources: []
+    },
+    {
+      id: "si-delivery",
+      icon: "🚀",
+      title: "SI App Delivery",
+      summary: "Implementation & delivery excellence.",
+      color: "green",
+      description: "Validates hands-on implementation skills: deploying clusters, migrating data, building applications, and operationalising MongoDB in production.",
+      topics: [
+        { name: "Exam Coverage", detail: "Hands-on deployment, data migration execution, application integration, monitoring setup, and incident response procedures." },
+        { name: "Prerequisites", detail: "SI Associate certification plus completion of 201 and 301 enablement tracks." },
+        { name: "Format", detail: "Practical lab-based assessment. Hands-on tasks in a live environment. 180 minutes." },
+      ],
+      resources: []
+    },
+    {
+      id: "sales-accred",
+      icon: "💼",
+      title: "Sales Accreditation",
+      summary: "Go-to-market & co-sell readiness.",
+      color: "green",
+      description: "Validates the ability to position MongoDB in sales conversations, handle objections, and drive co-sell motions with MongoDB's sales team.",
+      topics: [
+        { name: "Exam Coverage", detail: "MongoDB positioning, competitive differentiation, pricing and licensing models, co-sell process, and deal registration." },
+        { name: "Prerequisites", detail: "Completion of Presales Enablement track." },
+        { name: "Format", detail: "Online assessment with scenario-based questions. 60 minutes." },
+      ],
+      resources: []
+    },
+  ],
+
+  tracks: [
+    {
+      id: "industry",
+      icon: "🏭",
+      title: "By Industry",
+      summary: "Vertical-specific patterns & architectures.",
+      color: "amber",
+      description: "Deep-dive enablement tailored to specific industries, covering reference architectures, regulatory requirements, and proven deployment patterns.",
+      topics: [
+        { name: "Financial Services Track", detail: "Real-time payments, fraud detection architectures, regulatory compliance (PCI-DSS, SOX), and single customer view patterns." },
+        { name: "Retail & CPG Track", detail: "Product catalog management, personalisation engines, inventory systems, and omnichannel order management." },
+        { name: "Telco & Media Track", detail: "Network inventory modernisation, BSS/OSS transformation, content management, and IoT data platforms." },
+        { name: "Public Sector Track", detail: "Citizen service platforms, case management systems, data sovereignty requirements, and FedRAMP considerations." },
+      ],
+      resources: []
+    },
+    {
+      id: "workshops",
+      icon: "🔬",
+      title: "Hands-on Workshops",
+      summary: "Lab-based practical sessions.",
+      color: "amber",
+      description: "Instructor-led and self-paced lab sessions where partners build real applications and solve real problems using MongoDB technologies.",
+      topics: [
+        { name: "Atlas Fundamentals Lab", detail: "Provision clusters, load sample data, build queries, create indexes, and configure alerts in a guided hands-on session." },
+        { name: "Search & Vector Search Workshop", detail: "Build a full-text search application and implement RAG (Retrieval Augmented Generation) with Atlas Vector Search." },
+        { name: "Data Modelling Workshop", detail: "Redesign a relational schema for MongoDB using schema design patterns. Includes performance benchmarking." },
+        { name: "Migration Workshop", detail: "End-to-end migration from a relational database using Relational Migrator, including schema mapping and data validation." },
+      ],
+      resources: []
+    },
+    {
+      id: "modernisation",
+      icon: "🔄",
+      title: "Modernisation",
+      summary: "Legacy migration strategies.",
+      color: "amber",
+      description: "Specialised enablement for partners leading legacy database modernisation projects, from assessment through to production cutover.",
+      topics: [
+        { name: "Migration Patterns", detail: "Strangler fig, big bang, and phased migration approaches. When to use each and how to manage risk." },
+        { name: "Relational-to-Document Mapping", detail: "Systematic approach to converting normalised relational schemas to optimised document models." },
+        { name: "Testing & Validation", detail: "Data integrity verification, performance benchmarking, and application compatibility testing post-migration." },
+      ],
+      resources: []
+    },
+    {
+      id: "tooling",
+      icon: "🧰",
+      title: "Tooling",
+      summary: "DevOps & developer tools.",
+      color: "amber",
+      description: "Enablement on the MongoDB tooling ecosystem: drivers, Kubernetes operators, CLI tools, IDE integrations, and DevOps automation.",
+      topics: [
+        { name: "MongoDB Drivers & ODMs", detail: "Official drivers (Node, Python, Java, C#, Go), Mongoose, Prisma, and Spring Data MongoDB." },
+        { name: "Kubernetes Operator", detail: "Deploy and manage MongoDB on Kubernetes using the community and enterprise operators. StatefulSets, PVCs, and backup CRDs." },
+        { name: "Atlas CLI & Terraform", detail: "Infrastructure-as-code for Atlas: Atlas CLI for scripting, Terraform provider for declarative infrastructure management." },
+        { name: "VS Code & IDE Extensions", detail: "MongoDB for VS Code extension: connect to clusters, run queries, explore schemas, and use Copilot-style completions." },
+      ],
+      resources: []
+    },
+  ],
+};
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDERING — you shouldn't need to edit below unless changing layout
+   ═══════════════════════════════════════════════════════════════════ */
+
+function renderCards(containerId, items) {
+  const grid = document.getElementById(containerId);
+  items.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'card reveal';
+    card.dataset.color = item.color;
+    card.style.transitionDelay = `${i * 0.06}s`;
+    card.innerHTML = `
+      <div class="card-icon">${item.icon}</div>
+      ${item.badge ? `<span class="phase-badge ${item.badgeColor || item.color}">${item.badge}</span>` : ''}
+      <h3>${item.title}</h3>
+      <p>${item.summary}</p>
+      <span class="arrow-hint">→</span>
+    `;
+    card.addEventListener('click', () => openDetail(item));
+    grid.appendChild(card);
+  });
+}
+
+function openDetail(item) {
+  const header = document.getElementById('detail-header');
+  const body = document.getElementById('detail-body');
+
+  header.innerHTML = `
+    <div class="icon-wrap ${item.color}">${item.icon}</div>
+    <div>
+      ${item.badge ? `<div class="badge-row"><span class="phase-badge ${item.badgeColor || item.color}">${item.badge}</span></div>` : ''}
+      <h2>${item.title}</h2>
+    </div>
+    <button class="close-btn" onclick="closeDetail()">✕</button>
+  `;
+
+  let topicsHtml = '';
+  if (item.topics && item.topics.length) {
+    topicsHtml = `<h4>What's Covered</h4>`;
+    item.topics.forEach(t => {
+      topicsHtml += `
+        <div class="topic-row">
+          <div class="dot ${item.color}"></div>
+          <div>
+            <strong>${t.name}</strong>
+            <div class="topic-desc">${t.detail}</div>
+          </div>
+        </div>`;
+    });
+  }
+
+  body.innerHTML = `
+    <div class="desc">${item.description}</div>
+    ${topicsHtml}
+  `;
+
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('detail-panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDetail() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('detail-panel').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('overlay').addEventListener('click', closeDetail);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+
+// Render all sections
+renderCards('presales-grid', DATA.presales);
+renderCards('pathway-grid', DATA.pathway);
+renderCards('certs-grid', DATA.certifications);
+renderCards('tracks-grid', DATA.tracks);
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>
